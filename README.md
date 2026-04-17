@@ -1,9 +1,9 @@
 ![Tela Principal](docs/quiz-buzzer.png)
-# 🕹️ Quiz Buzzer (WebSockets)
+#  Quiz Buzzer (WebSockets)
 
 Um sistema completo de Quiz Buzzer (botões de resposta) para eventos locais, rodando direto no navegador dos smartphones dos participantes. Desenvolvido com Python, Flask e WebSockets para garantir tempo de resposta em milissegundos.
 
-## ✨ Funcionalidades
+##  Funcionalidades
 
 * **Tempo Real:** Comunicação via WebSocket, registrando quem apertou primeiro na mesma fração de segundo.
 * **Travamento Anti-Cheating:** O primeiro clique trava a tela de todos os outros participantes.
@@ -13,13 +13,13 @@ Um sistema completo de Quiz Buzzer (botões de resposta) para eventos locais, ro
 * **Mobile First (e Blindado):** A tela dos jogadores foi desenhada para impedir comportamento padrão do celular (como zoom ao dar cliques duplos ou elástico de rolagem na tela), garantindo que o botão não falhe na hora da adrenalina.
 * **Tema Dark/Neon:** Visual moderno de Game Show.
 
-## 🛠️ Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 * **Backend:** Python 3, Flask, Flask-SocketIO.
 * **Frontend:** HTML5, CSS3, Vanilla JavaScript, Socket.IO Client.
 * **Outros:** QRCode.js (Geração de QR Code via Client-side).
 
-## 📁 Estrutura do Projeto
+##  Estrutura do Projeto
 
 ```text
 quiz-buzzer/
