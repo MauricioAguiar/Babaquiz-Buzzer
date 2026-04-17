@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quiz Buzzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div style="text-align: center;">
+        <h1 style="color: var(--neon-roxo); text-shadow: 0 0 20px var(--neon-roxo); font-size: 3rem; margin-bottom: 40px;">QUIZ BUZZER</h1>
+        
+        <input type="text" id="username" placeholder="Seu Nome">
+        <br>
+        <button class="big-btn btn-unlock" onclick="enterRoom('player')">Entrar como Jogador</button>
+        <br>
+        <button class="big-btn btn-set" onclick="enterRoom('host')" style="background-color: #2a2238; border: 1px solid var(--neon-roxo); color: white;">Sou o Host</button>
+        
+        <div style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #333; display: flex; justify-content: center; gap: 30px;">
+            <a href="/display" style="color: var(--neon-verde); text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.2s;" onmouseover="this.style.textShadow='0 0 10px var(--neon-verde)'" onmouseout="this.style.textShadow='none'">
+                📺 Abrir Telão
+            </a>
+            
+            <a href="/soundboard" style="color: var(--neon-laranja); text-decoration: none; font-size: 0.9rem; font-weight: bold; transition: 0.2s;" onmouseover="this.style.textShadow='0 0 10px var(--neon-laranja)'" onmouseout="this.style.textShadow='none'">
+                🎛️ Mesa de Som
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function enterRoom(role) {
+            const name = document.getElementById('username').value.trim();
+            if(!name && role === 'player') return alert('Digite um nome para entrar!');
+            
+            localStorage.setItem('quiz_username', name || 'Host');
+            window.location.href = '/' + role;
+        }
+    </script>
+</body>
+</html>

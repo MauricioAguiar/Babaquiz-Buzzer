@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Buzzer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="buzzer-screen"></body>
+    <button id="fs-btn" onclick="openFullscreen()">⛶ Tela Cheia</button>
+
+    <div class="scoreboard-mini" id="my-score">Pontos: 0</div>
+
+    <button id="buzzer-btn" disabled>AGUARDE</button>
+    <div id="status">Esperando Host...</div>
+
+    <script>
+        const socket = io();
+        const username = localStorage.getItem('quiz_username') || 'Anonimo';
+        const btn = document.getElementById('buzzer-btn');
+        const status = document.getElementById('status');
+
+        socket.emit('join_game', { username: username, role: 'player' });
+
+        // Função do Botão Buzzer
+        function apertarBotao(e) {
+            if (e) e.preventDefault(); // MATADOR DE ZOOM: Impede o comportamento padrão do celular
+
+            if (!btn.disabled) {
+                // Adiciona uma classe para dar o efeito visual de botão apertado no touchstart
+                btn.classList.add('pressed');
+                socket.emit('buzz', { username: username });
+            }
+        }
+
+        // Remove o efeito visual de apertado quando o dedo sai da tela
+        function soltarBotao(e) {
+            btn.classList.remove('pressed');
+        }
+
+        // Usamos touchstart para ser INSTANTÂNEO no celular
+        btn.addEventListener('touchstart', apertarBotao, { passive: false });
+        btn.addEventListener('touchend', soltarBotao);
+
+        // Mantemos o click como fallback caso alguém jogue pelo PC com o mouse
+        btn.addEventListener('click', apertarBotao);
+
+        // Impede qualquer tentativa de arrastar a tela globalmente
+        document.addEventListener('touchmove', function (e) {
+            e.preventDefault();
+        }, { passive: false });
+
+        // --- Eventos do Jogo ---
+
+        socket.on('game_status', (data) => {
+            if (data.status === 'unlocked') {
+                btn.disabled = false;
+                btn.classList.add('active');
+                btn.innerText = "APERTE!";
+                btn.style.backgroundColor = "#28a745"; // Verde
+                status.innerText = "VALENDO!";
+            } else if (data.status === 'reset') {
+                btn.disabled = true;
+                btn.classList.remove('active');
+                btn.classList.remove('pressed');
+                btn.innerText = "AGUARDE";
+                btn.style.backgroundColor = "#555";
+                status.innerText = "Esperando Host...";
+                //document.body.style.backgroundColor = "#333";
+            }
+        });
+
+        socket.on('player_won', (data) => {
+            btn.disabled = true;
+            btn.classList.remove('active');
+            btn.classList.remove('pressed');
+
+            if (data.winner === username) {
+                //document.body.style.backgroundColor = "#007bff";
+                status.innerText = "VOCÊ GANHOU!";
+                btn.innerText = "WIN!";
+                if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            } else {
+                //document.body.style.backgroundColor = "#dc3545";
+                status.innerText = data.winner + " ganhou!";
+                btn.innerText = "TRAVADO";
+            }
+        });
+
+        socket.on('update_scores', (scores) => {
+            if (scores[username] !== undefined) {
+                document.getElementById('my-score').innerText = "Pontos: " + scores[username];
+            }
+        });
+
+        // --- Função de Tela Cheia ---
+        function openFullscreen() {
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+            document.getElementById('fs-btn').style.display = 'none'; // Esconde o botão após usar
+        }
+    </script>
+</body>
+
+</html>

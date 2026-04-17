@@ -1,0 +1,213 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&display=swap');
+
+/* --- 1. PALETA DE CORES NEON --- */
+:root {
+    --bg-dark: #0b0914;         /* Fundo super escuro (quase preto) */
+    --panel-dark: #1a1525;      /* Fundo de painéis e botões escuros */
+    --text-light: #f8f9fa;
+    
+    --neon-roxo: #bd00ff;
+    --neon-verde: #00ffaa;
+    --neon-laranja: #ff6a00;
+}
+
+/* --- 2. ESTILOS GERAIS --- */
+html, body {
+    margin: 0; padding: 0;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1, h2, h3 {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+form, .login-container {
+    margin-top: 10vh;
+}
+/* Container do QR Code */
+#qr-container {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    background: #00ffaa; /* Fundo branco salva vidas em QR Code */
+    border: 4px solid var(--neon-roxo); /* Mantém o tema Neon na borda! */
+    border-radius: 12px;
+    padding: 5px; /* Cria a 'Quiet Zone' necessária para a câmera */
+    text-align: center;
+    box-shadow: 0 0 25px rgba(189, 0, 255, 0.5);
+    z-index: 100;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Removemos a trava de tamanho! Agora o JS manda no tamanho. 
+A biblioteca gera tanto img quanto canvas, aplicamos nos dois */
+#qr-container img, #qr-container canvas {
+    display: block;
+    margin: 0 auto;
+}
+
+#qr-container[style*="display: none"] {
+    display: block !important;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+#qr-container p {
+    margin: 15px 0 0 0;
+    font-size: 1.2rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    color: var(--bg-dark); /* Texto escuro para ler bem no fundo branco */
+    text-transform: uppercase;
+}
+
+/* Estilo padrão para inputs textuais */
+input[type="text"], input[type="number"] {
+    background: var(--panel-dark);
+    border: 2px solid var(--neon-roxo);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    box-shadow: 0 0 10px rgba(189, 0, 255, 0.2);
+}
+
+input:focus {
+    box-shadow: 0 0 15px var(--neon-roxo);
+}
+
+/* --- 3. TELA DO JOGADOR (BUZZER) --- */
+/* Esta classe aplica as travas de mobile apenas na tela do botão */
+.buzzer-screen {
+    height: 100dvh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    overflow: hidden; overscroll-behavior: none;
+    touch-action: none; user-select: none; -webkit-user-select: none;
+}
+
+#buzzer-btn {
+    width: 280px; height: 280px; border-radius: 50%; border: none;
+    font-family: 'Poppins', sans-serif; font-size: 2.5rem; font-weight: 900;
+    color: rgba(255,255,255,0.5);
+    background: #222; 
+    box-shadow: 0 15px #111, inset 0 0 20px rgba(0,0,0,0.5);
+    transition: all 0.1s; cursor: not-allowed;
+    touch-action: none; -webkit-tap-highlight-color: transparent;
+}
+
+/* Estado Liberado (VERDE NEON) */
+#buzzer-btn.active { 
+    background: var(--neon-verde); 
+    color: var(--bg-dark);
+    box-shadow: 0 15px #00a870, 0 0 40px var(--neon-verde), inset 0 0 20px rgba(255,255,255,0.5); 
+    cursor: pointer; 
+}
+
+/* Efeito de Clique Físico */
+#buzzer-btn.active.pressed { 
+    transform: translateY(15px); 
+    box-shadow: 0 0px #00a870, 0 0 60px var(--neon-verde); 
+}
+
+/* --- 4. TELA DE EXIBIÇÃO (TELÃO) --- */
+#display-body {
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding: 40px;
+}
+
+#status-display {
+    font-size: 3rem; font-weight: 900; text-align: center;
+    color: var(--neon-laranja);
+    text-shadow: 0 0 20px var(--neon-laranja);
+    margin-bottom: 40px; transition: all 0.3s;
+}
+
+#status-display.winner-mode { 
+    color: var(--neon-verde);
+    text-shadow: 0 0 30px var(--neon-verde);
+    transform: scale(1.1);
+}
+
+#scoreboard {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%;
+}
+
+.player-card {
+    background: var(--panel-dark);
+    border: 3px solid var(--neon-roxo);
+    border-radius: 15px; padding: 25px; min-width: 220px; text-align: center;
+    box-shadow: 0 0 20px rgba(189, 0, 255, 0.3), inset 0 0 15px rgba(189, 0, 255, 0.1);
+}
+
+.player-card .player-name { font-size: 1.8rem; font-weight: bold; color: var(--text-light); }
+.player-card .player-score { font-size: 4.5rem; font-weight: 900; color: var(--neon-laranja); text-shadow: 0 0 15px var(--neon-laranja); margin: 0; }
+
+/* --- 5. PAINEL DO HOST & LOGIN --- */
+.big-btn { 
+    width: 90%; max-width: 400px; padding: 20px; font-size: 1.5rem; font-weight: bold; font-family: 'Poppins';
+    margin: 10px auto; display: block; border: none; border-radius: 8px; color: var(--bg-dark); cursor: pointer; text-transform: uppercase;
+}
+.btn-unlock { background-color: var(--neon-verde); box-shadow: 0 0 15px var(--neon-verde); }
+.btn-reset { background-color: var(--neon-laranja); box-shadow: 0 0 15px var(--neon-laranja); }
+
+.scoreboard-host { background: var(--panel-dark); padding: 20px; border-radius: 8px; max-width: 600px; margin: 20px auto; border: 1px solid #333;}
+.player-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #333; }
+.btn-action { padding: 10px 15px; font-family: 'Poppins'; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; color: white;}
+.btn-add { background: var(--neon-roxo); }
+.btn-set { background: #444; }
+
+
+/* --- 6. SOUNDBOARD --- */
+.sound-grid { 
+    display: grid; 
+    /* Força exatas 2 colunas em telas pequenas */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 15px; 
+    padding: 20px;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+/* Se a tela for de computador (maior que 600px), ele volta a colocar mais botões por linha */
+@media (min-width: 600px) {
+    .sound-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+}
+
+.sound-btn { 
+    background: var(--panel-dark); 
+    border: 2px solid var(--neon-laranja); 
+    color: var(--text-light); 
+    padding: 15px 10px; /* Reduzimos um pouco o padding para caber texto no celular */
+    border-radius: 12px; 
+    font-size: 1rem; 
+    font-weight: bold; 
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer; 
+    text-transform: capitalize;
+    box-shadow: 0 0 10px rgba(255, 106, 0, 0.2); 
+    transition: 0.1s;
+    width: 100%; /* Faz o botão preencher todo o espaço do grid */
+    word-wrap: break-word; /* Permite que textos grandes quebrem de linha */
+}
+
+.sound-btn:active { 
+    background: var(--neon-laranja); 
+    color: var(--bg-dark); 
+    transform: scale(0.95); 
+    box-shadow: 0 0 25px var(--neon-laranja); 
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mesa de Som</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <h1>🎛️ Mesa de Efeitos Sonoros</h1>
+
+    <div class="sound-grid">
+        {% for sound in sounds %}
+            
+            <button class="sound-btn" onclick="playSound('{{ sound }}')">
+                {{ sound[:-4] | replace('_', ' ') }}
+            </button>
+            
+        {% endfor %}
+    </div>
+
+    <script>
+        // Função que é chamada ao clicar no botão
+        function playSound(filename) {
+            // Cria um áudio apontando para a pasta certa e dá play na hora
+            const audio = new Audio('/static/sounds/' + filename);
+            audio.play().catch(e => console.log("Erro ao tocar:", e));
+        }
+    </script>
+
+</body>
+</html>

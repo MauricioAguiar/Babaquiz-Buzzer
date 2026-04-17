@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Telão - Placar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body id="display-body">
+
+    <div id="qr-container">
+        <div id="qrcode-img"></div>
+        <p>Escaneie para<br>JOGAR!</p>
+    </div>
+
+    <h1>PLACAR GERAL</h1>
+    <div id="status-display">Aguardando Host...</div>
+
+    <div id="scoreboard">
+    </div>
+
+    <script>
+        const socket = io();
+
+                // Pega a URL que o Python enviou
+        const urlDoJogo = "{{ url_jogo }}";
+
+        // Desenha o QR Code na tela
+        new QRCode(document.getElementById("qrcode-img"), {
+            text: urlDoJogo,
+            width: 120,
+            height: 120,
+            colorDark : "#1a1525",  // Cor dos quadradinhos (Escura)
+            colorLight : "#00ffaa", // Fundo do QR code (Verde Neon!)
+            correctLevel : QRCode.CorrectLevel.M
+        });
+
+                // Adicione este listener dentro do bloco <script>
+        socket.on('update_qr_visibility', (data) => {
+            const qrContainer = document.getElementById('qr-container');
+            if (data.visible) {
+                qrContainer.style.display = 'block';
+            } else {
+                qrContainer.style.display = 'none';
+            }
+        });
+
+        // Conecta avisando que é a tela de exibição (não interfere nos jogadores)
+        socket.emit('join_game', { username: 'Telão', role: 'display' });
+
+        const statusDisplay = document.getElementById('status-display');
+        const scoreboard = document.getElementById('scoreboard');
+
+        // Escuta as mudanças de status do jogo (Liberado, Resetado)
+        socket.on('game_status', (data) => {
+            statusDisplay.classList.remove('winner-mode'); // Tira o fundo vermelho de vencedor
+
+            if (data.status === 'unlocked') {
+                statusDisplay.innerText = "VALENDO! QUEM BATER PRIMEIRO RESPONDE!";
+                statusDisplay.style.color = "#28a745"; // Verde
+            } else if (data.status === 'reset') {
+                statusDisplay.innerText = "Preparando próxima pergunta...";
+                statusDisplay.style.color = "#ffc107"; // Amarelo
+            }
+        });
+
+        // Escuta quem apertou primeiro
+        socket.on('player_won', (data) => {
+            statusDisplay.innerText = "🚨 VENCEDOR DA VEZ: " + data.winner.toUpperCase() + " 🚨";
+            statusDisplay.classList.add('winner-mode'); // Fundo vermelho chamativo
+        });
+
+        // Atualiza os pontos na tela em tempo real
+        socket.on('update_scores', (scores) => {
+            scoreboard.innerHTML = ''; // Limpa a tela
+
+            // Transforma o objeto de scores num array e ordena do maior para o menor (opcional, mas legal para placar)
+            const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+            for (const [user, score] of sortedScores) {
+                // Ignora o Host e o próprio Telão no placar visual
+                if (user !== 'Host' && user !== 'Telão') {
+                    scoreboard.innerHTML += `
+                        <div class="player-card">
+                            <div class="player-name">${user}</div>
+                            <div class="player-score">${score}</div>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
