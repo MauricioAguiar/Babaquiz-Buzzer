@@ -182,4 +182,4 @@ cython_debug/
 
 
 static/sounds/*.mp3
-static/*.mp3
+static/buzzer.mp3
